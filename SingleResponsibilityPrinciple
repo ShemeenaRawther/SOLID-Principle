@@ -1,42 +1,62 @@
-1️⃣ Single Responsibility Principle (SRP):
-A class should do only one responsibility. meaning Each class should focus on one responsibility and this enhances the reusability and readability.
-Sample code:
-1, Requirement : Get the employee detals, calculate employee salary and save employee details to the database.So ideally what comes to our mind is to create single class 
-with all responsibility in it.
+SOLID Principles - Single Responsibility Principle (SRP) in C#
+📌 What is SRP?
+The Single Responsibility Principle (SRP) states that a class should have only one responsibility.
+Each class should focus on one responsibility, which enhances reusability and readability.
 
-public class Employee{
- public string Name{get;set;}
- public double Salary{get;set;}
+🔧 Problem Statement
+📌 Requirement:
+We need to:
+1️⃣ Get employee details
+2️⃣ Calculate employee salary
+3️⃣ Save employee details to the database
 
-// ❌ SRP Violation: This method calculates salary
-public double CalculateSalary(){
- return Salary*2.0; // Adding a 10% bonus
+💡 Initial Thought:
+A single class handling all these responsibilities.
+
+public class Employee
+{
+    public string Name { get; set; }
+    public double Salary { get; set; }
+
+    // ❌ SRP Violation: This method calculates salary
+    public double CalculateSalary()
+    {
+        return Salary * 2.0; // Applying a bonus
+    }
+
+    // ❌ SRP Violation: This method saves employee data to the database
+    public void SaveEmployeeDetails()
+    {
+        Console.WriteLine("Employee saved to database.");
+    }
 }
-
-// ❌ SRP Violation: This method saves employee data to the database
-public void SaveEmployeeDetails(){
-Console.WriteLine("Employee saved to database.");
-}
-}
-
-🔴 Issues in this Code
-❌ Mixed Responsibilities: This class does too many things.
-❌ Hard to Maintain: If salary calculation logic changes, we modify the same class that handles database logic.
+🔴 Issues in this Code:
+❌ Mixed Responsibilities: The class handles too many things (data, business logic, and database operations).
+❌ Hard to Maintain: If the salary calculation logic changes, we have to modify a class that also handles database logic.
 ❌ Difficult to Test: Unit testing is harder because the class has multiple concerns.
 
-To follow SRP, we separate responsibilities into different classes.
-1, Have Employee model class to keep employee details
+✅ Refactored Code - Following SRP
+Step 1️⃣: Create an Employee Model (Only Holds Data)
 public class Employee
 {
     public string Name { get; set; }
     public double Salary { get; set; }
 }
-2,Have SalaryCalculator to only calculate the salary.
-public class SalaryCalculator{
-public double Calculate(Employee employee){
-return employee*2.0; // goving a 20% bonus.
+✔ Now, Employee class only stores data.
+
+Step 2️⃣: Create a SalaryCalculator Class
+Handles only salary-related logic.
+public class SalaryCalculator
+{
+    public double Calculate(Employee employee)
+    {
+        return employee.Salary * 2.0; // Applying a 20% bonus
+    }
 }
-3,Use EmployeeRepository to save to database.
+✔ Now, Salary calculation is in a separate class.
+
+Step 3️⃣: Create an EmployeeRepository Class
+Handles database operations separately.
 public class EmployeeRepository
 {
     public void SaveToDatabase(Employee employee)
@@ -44,5 +64,34 @@ public class EmployeeRepository
         Console.WriteLine($"Employee {employee.Name} saved to database.");
     }
 }
+✔ Now, the database operation is also separate.
 
-So here we introduced one model class, one logic class and one data model repository class and divided the responsibility in to seperate classes.
+💡 Final Thoughts
+By separating responsibilities, we achieve:
+✅ Better Code Reusability
+✅ Easier Maintenance
+✅ Better Testability
+✅ More Readable & Clean Code
+
+🛠 Running the Code
+To test the above classes in a Main Program:
+class Program
+{
+    static void Main()
+    {
+        Employee emp = new Employee { Name = "John Doe", Salary = 50000 };
+
+        // Salary calculation
+        SalaryCalculator salaryCalculator = new SalaryCalculator();
+        double newSalary = salaryCalculator.Calculate(emp);
+        Console.WriteLine($"New Salary: {newSalary}");
+
+        // Save employee details
+        EmployeeRepository repository = new EmployeeRepository();
+        repository.SaveToDatabase(emp);
+    }
+}
+📌 Summary
+Approach	Issues / Benefits
+❌ Bad Example (SRP Violation)	One class handles multiple responsibilities (salary calculation, database operations).
+✅ Good Example (Follows SRP)	Each class has one responsibility, making the code cleaner and more maintainable.
