@@ -1,2 +1,48 @@
 1️⃣ Single Responsibility Principle (SRP):
 A class should do only one responsibility. meaning Each class should focus on one responsibility and this enhances the reusability and readability.
+Sample code:
+1, Requirement : Get the employee detals, calculate employee salary and save employee details to the database.So ideally what comes to our mind is to create single class 
+with all responsibility in it.
+
+public class Employee{
+ public string Name{get;set;}
+ public double Salary{get;set;}
+
+// ❌ SRP Violation: This method calculates salary
+public double CalculateSalary(){
+ return Salary*2.0; // Adding a 10% bonus
+}
+
+// ❌ SRP Violation: This method saves employee data to the database
+public void SaveEmployeeDetails(){
+Console.WriteLine("Employee saved to database.");
+}
+}
+
+🔴 Issues in this Code
+❌ Mixed Responsibilities: This class does too many things.
+❌ Hard to Maintain: If salary calculation logic changes, we modify the same class that handles database logic.
+❌ Difficult to Test: Unit testing is harder because the class has multiple concerns.
+
+To follow SRP, we separate responsibilities into different classes.
+1, Have Employee model class to keep employee details
+public class Employee
+{
+    public string Name { get; set; }
+    public double Salary { get; set; }
+}
+2,Have SalaryCalculator to only calculate the salary.
+public class SalaryCalculator{
+public double Calculate(Employee employee){
+return employee*2.0; // goving a 20% bonus.
+}
+3,Use EmployeeRepository to save to database.
+public class EmployeeRepository
+{
+    public void SaveToDatabase(Employee employee)
+    {
+        Console.WriteLine($"Employee {employee.Name} saved to database.");
+    }
+}
+
+So here we introduced one model class, one logic class and one data model repository class and divided the responsibility in to seperate classes.
