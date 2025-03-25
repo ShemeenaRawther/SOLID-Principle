@@ -2,3 +2,98 @@ Open/Closed Principle (OCP) states:
 "A class should be open for extension but closed for modification."
 🔹 This means we should be able to extend the behavior of a class without modifying its existing code.
 🔹 This can be achieved using Abstraction & Polymorphism (Interfaces, Abstract Classes).
+
+📌 Requirement
+Scenario:
+A company needs a payment processing system that supports different payment methods like Credit Card and PayPal.
+Later, the company wants to add Google Pay as a payment option.
+
+🚨 Problem:So here what is the problem, more payment method can be added in the future. 
+so there will be always a modification in this area.If we modifiy the class then  it violate open/closed principle.
+
+lets analyse how normally we do first and then will convert the class to adhere to open/closed principle.
+
+public class PaymentProcessor{
+public void ProcessPayment(string paymentType){
+  if (paymentType == "CreditCard")
+  {
+      Console.WriteLine("Processing Credit Card payment...");
+  }
+  else if (paymentType == "PayPal")
+  {
+      Console.WriteLine("Processing PayPal payment...");
+  }
+//so here new payment method can come and if we add any code here then we are modifying this class.
+}
+}
+
+Issues with above code:
+Difficult to Maintain – Adding new features requires changing existing logic, increasing risk.
+❌ Not Scalable – More payment methods = more if-else conditions, making the code messy.
+how to change the above code to follow OCP.
+Abstraction(interfaces) are the keywords for extension.........
+lets change the above code :
+Create an Interface named IPaymentMethod
+public interface IPaymentMethod
+{
+    void ProcessPayment();
+}
+
+public class CreditCardPyamnet : IPaymentMethod{
+ public void ProcessPayment()
+{
+  Console.WriteLine("Processing Credit Card payment...");
+}
+}
+
+public class PayPalPayment : IPaymentMethod
+{
+    public void ProcessPayment()
+    {
+        Console.WriteLine("Processing PayPal payment...");
+    }
+}
+
+public class PaymentProcessor{
+private readonly IPaymentMethod _paymenthMethod;
+public PaymentProcessor(IPaymentMethod paymenthMethod){
+_paymenthMethod = paymenthMethod;
+}
+
+public void ProcessPayment(){
+_paymentMethod.ProcessPayment();
+}
+
+}
+✔ Now, the PaymentProcessor is not modified when new payment methods are added.
+✔ Instead, it depends on an abstraction (IPaymentMethod).
+
+Step 4️⃣: Adding a New Payment Method Without Modifying Existing Code
+public class GooglePayPayment : IPaymentMethod
+{
+    public void ProcessPayment()
+    {
+        Console.WriteLine("Processing Google Pay payment...");
+    }
+}
+✔ We added GooglePayPayment without modifying the PaymentProcessor class!
+
+class Program
+{
+    static void Main()
+    {
+        IPaymentMethod payment = new CreditCardPayment(); // Change method here without modifying PaymentProcessor
+        PaymentProcessor processor = new PaymentProcessor(payment);
+        processor.ProcessPayment();
+
+        // Switch to PayPal without modifying PaymentProcessor
+        payment = new PayPalPayment();
+        processor = new PaymentProcessor(payment);
+        processor.ProcessPayment();
+
+        // Add Google Pay without modifying existing classes
+        payment = new GooglePayPayment();
+        processor = new PaymentProcessor(payment);
+        processor.ProcessPayment();
+    }
+}
