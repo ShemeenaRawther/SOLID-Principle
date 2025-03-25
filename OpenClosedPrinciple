@@ -1,0 +1,4 @@
+Open/Closed Principle (OCP) states:
+"A class should be open for extension but closed for modification."
+🔹 This means we should be able to extend the behavior of a class without modifying its existing code.
+🔹 This can be achieved using Abstraction & Polymorphism (Interfaces, Abstract Classes).
