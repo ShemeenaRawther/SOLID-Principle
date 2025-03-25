@@ -1,1 +1,98 @@
 Liskov Substitution Principle (LSP):
+📌 What is the Liskov Substitution Principle (LSP)?
+The Liskov Substitution Principle (LSP) states:
+🔹 "Subtypes must be substitutable for their base types without altering the correctness of the program."
+🔹 This means that if class B is a subclass of class A, we should be able to replace A with B without breaking the behavior of the application.
+🔹 It ensures correct inheritance by preventing unexpected behavior in derived classes.
+
+📌 Scenario
+A company supports multiple payment methods (e.g., Credit Card, PayPal, and UPI).
+We need to process payments without modifying existing code when adding new payment methods.
+
+public class PaymentProcessor
+{
+    public virtual void ProcessPayment(double amount)
+    {
+        Console.WriteLine($"Processing payment of {amount}...");
+    }
+}
+
+// ❌ LSP Violation: PayPal doesn't support direct payment, but we're forcing it
+public class PayPalProcessor : PaymentProcessor
+{
+    public override void ProcessPayment(double amount)
+    {
+        throw new NotImplementedException("PayPal requires authentication before processing payment.");
+    }
+}
+🔴 Issues in this Code
+❌ LSP Violation – PayPalProcessor cannot be used as a PaymentProcessor.
+❌ Unexpected Behavior – Instead of processing payment, PayPalProcessor throws an exception.
+❌ Breaks Substitution Rule – If we replace PaymentProcessor with PayPalProcessor, it fails unexpectedly.
+
+how to fix this :
+Instead of forcing incorrect inheritance, we use an interface to define payment behavior.
+Step 1️⃣: Define a Payment Interface
+public interface IPayment
+{
+    void ProcessPayment(double amount);
+}
+✔ Now, all payment methods must implement this interface correctly
+Step 2️⃣: Implement Payment Methods Correctly
+public class CreditCardPayment : IPayment
+{
+    public void ProcessPayment(double amount)
+    {
+        Console.WriteLine($"Processing Credit Card payment of {amount}");
+    }
+}
+
+public class PayPalPayment : IPayment
+{
+    public void ProcessPayment(double amount)
+    {
+        Console.WriteLine($"Processing PayPal payment of {amount} after authentication.");
+    }
+}
+
+public class UPIPayment : IPayment
+{
+    public void ProcessPayment(double amount)
+    {
+        Console.WriteLine($"Processing UPI payment of {amount}");
+    }
+}
+✔ Each payment method follows LSP correctly without overriding unwanted behaviors.
+Step 3️⃣: Use Payment Methods Without Breaking LSP
+
+class PaymentService
+{
+    public static void MakePayment(IPayment paymentMethod, double amount)
+    {
+        paymentMethod.ProcessPayment(amount);
+    }
+
+    static void Main()
+    {
+        IPayment creditCard = new CreditCardPayment();
+        IPayment payPal = new PayPalPayment();
+        IPayment upi = new UPIPayment();
+
+        MakePayment(creditCard, 500.00);  // ✅ Works
+        MakePayment(payPal, 300.00);      // ✅ Works
+        MakePayment(upi, 200.00);         // ✅ Works
+    }
+}
+
+✔ Now, we can add new payment methods without modifying existing code.
+✔ Each payment method can be substituted without breaking behavior (LSP).
+✅ Benefits of Following LSP
+Bad Example (LSP Violation)	Good Example (Follows LSP)
+❌ PayPalProcessor breaks expected behavior.	✅ PayPalPayment implements payment logic correctly.
+❌ Substituting PaymentProcessor with PayPalProcessor fails.	✅ All payment methods work interchangeably via IPayment.
+❌ Forces incorrect inheritance.	✅ Uses interfaces for correct polymorphism.
+
+🎯 Summary
+🔹 LSP Rule: A derived class should be able to replace its base class without breaking functionality.
+🔹 Use interfaces instead of forcing inheritance when behavior varies.
+🔹 Ensures flexibility – We can add new payment methods without modifying existing code.
