@@ -1,0 +1,142 @@
+📌 What is the Interface Segregation Principle (ISP)?
+🔹 "Clients should not be forced to depend on interfaces they do not use."
+🔹 Instead of having one large interface, split it into multiple smaller, specific interfaces.
+🔹 This prevents unnecessary dependencies in classes and ensures better maintainability.
+
+📌 Requirement
+Scenario:
+A company wants to design a multifunctional printer system that supports:
+✅ Printing
+✅ Scanning
+✅ Faxing
+
+However, not all printers support all functionalities.
+
+Some printers only print.
+Some printers print & scan but do not fax.
+Some printers support all three functions.
+We need a flexible design that allows defining only the required functionalities without forcing unnecessary dependencies.
+
+lets implement without ISP:
+// ❌ Bad: One large interface that forces all printers to implement unnecessary methods
+public interface IPrinter
+{
+    void Print(string content);
+    void Scan(string content);
+    void Fax(string content);
+}
+
+// ❌ Violates ISP: Basic printers should not be forced to implement Scan and Fax
+public class BasicPrinter : IPrinter
+{
+    public void Print(string content)
+    {
+        Console.WriteLine("Printing: " + content);
+    }
+
+    public void Scan(string content)
+    {
+        throw new NotImplementedException("BasicPrinter does not support scanning.");
+    }
+
+    public void Fax(string content)
+    {
+        throw new NotImplementedException("BasicPrinter does not support faxing.");
+    }
+}
+
+🔴 Issues in this Code
+❌ Forces Unnecessary Implementations – BasicPrinter must implement Scan() and Fax() even though it doesn’t support them.
+❌ Violates ISP – Clients should not be forced to depend on methods they do not need.
+❌ Leads to Runtime Errors – throw new NotImplementedException(); introduces unexpected failures.
+
+To fix the issue, split the large interface into multiple smaller interfaces:
+Step 1️⃣: Create Small, Specific Interfaces
+public interface IPrint
+{
+    void Print(string content);
+}
+
+public interface IScan
+{
+    void Scan(string content);
+}
+
+public interface IFax
+{
+    void Fax(string content);
+}
+✔ Now, printers only implement what they support.
+
+Step 2️⃣: Implement Specific Functionalities in Printers
+// ✅ Basic Printer: Only Implements IPrint
+public class BasicPrinter : IPrint
+{
+    public void Print(string content)
+    {
+        Console.WriteLine("Printing: " + content);
+    }
+}
+
+// ✅ MultiFunction Printer: Implements Print, Scan, and Fax
+public class MultiFunctionPrinter : IPrint, IScan, IFax
+{
+    public void Print(string content)
+    {
+        Console.WriteLine("Printing: " + content);
+    }
+
+    public void Scan(string content)
+    {
+        Console.WriteLine("Scanning: " + content);
+    }
+
+    public void Fax(string content)
+    {
+        Console.WriteLine("Faxing: " + content);
+    }
+}
+
+// ✅ Scanner: Only Implements IScan
+public class Scanner : IScan
+{
+    public void Scan(string content)
+    {
+        Console.WriteLine("Scanning: " + content);
+    }
+}
+✔ Now, each printer implements only the required interfaces.
+✔ No more unnecessary dependencies!
+
+Step 3️⃣: Use the Printers Without Breaking ISP
+
+class Program
+{
+    static void Main()
+    {
+        IPrint printer = new BasicPrinter();
+        printer.Print("Document.pdf");
+
+        IScan scanner = new Scanner();
+        scanner.Scan("Photo.png");
+
+        MultiFunctionPrinter multiPrinter = new MultiFunctionPrinter();
+        multiPrinter.Print("Report.docx");
+        multiPrinter.Scan("Receipt.jpg");
+        multiPrinter.Fax("Invoice.pdf");
+    }
+}
+
+✔ Now, each device supports only the necessary features.
+✔ No unnecessary method implementations.
+
+✅ Benefits of Following ISP
+Bad Example (ISP Violation)	Good Example (Follows ISP)
+❌ One large interface forces unnecessary implementations.	✅ Multiple smaller interfaces keep designs clean.
+❌ Basic printers must implement Scan() and Fax().	✅ Printers only implement what they support.
+❌ Leads to NotImplementedException.	✅ No runtime errors due to missing methods.
+
+🎯 Summary
+🔹 ISP Rule: Do not force a class to implement methods it does not use.
+🔹 Split large interfaces into smaller, specific ones to avoid unnecessary dependencies.
+🔹 Ensures flexibility and maintainability.
