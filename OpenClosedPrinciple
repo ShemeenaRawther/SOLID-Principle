@@ -97,3 +97,16 @@ class Program
         processor.ProcessPayment();
     }
 }
+
+✅ Benefits of Following OCP
+Bad Example (OCP Violation)	Good Example (Follows OCP)
+❌ PaymentProcessor must be modified for every new payment method.	✅ New payment methods can be added without modifying PaymentProcessor.
+❌ High risk of breaking existing functionality.	✅ Less risk of breaking existing code.
+❌ Code is tightly coupled and difficult to maintain.	✅ Code is modular, easy to extend, and scalable.
+
+🎯 Summary
+🔹 OCP Rule: Classes should be open for extension, but closed for modification.
+🔹 Use Abstraction (Interfaces, Abstract Classes) to allow extending functionality.
+🔹 Avoid modifying existing code when adding new features.
+
+Would you like more real-world examples of OCP? 😊
