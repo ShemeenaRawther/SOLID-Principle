@@ -1,0 +1,141 @@
+Dependency Inversion Principle (DIP):
+📌 What is the Dependency Inversion Principle (DIP)?
+🔹 "High-level modules should not depend on low-level modules. Both should depend on abstractions."
+🔹 "Abstractions should not depend on details. Details should depend on abstractions."
+🔹 This helps in making the system loosely coupled, more maintainable, and easier to extend.
+
+📌 Requirement
+Scenario:
+A company wants to design a notification system that supports:
+✅ Email Notifications
+✅ SMS Notifications
+
+The system should be flexible so that new notification types (e.g., Push Notifications) can be added without modifying existing code.
+lets implement the above requirment normally and identify the issue with it.
+// ❌ Low-level module: Directly tied to a specific implementation
+public class EmailNotification
+{
+    public void SendEmail(string message)
+    {
+        Console.WriteLine("Sending Email: " + message);
+    }
+}
+
+public class SMSNotification
+{
+    public void SendSMS(string message)
+    {
+        Console.WriteLine("Sending SMS: " + message);
+    }
+}
+
+// ❌ High-level module directly depends on low-level modules
+public class NotificationService
+{
+    private EmailNotification emailNotification;
+    private SMSNotification smsNotification;
+
+    public NotificationService()
+    {
+        emailNotification = new EmailNotification();
+        smsNotification = new SMSNotification();
+    }
+
+    public void SendNotification(string message)
+    {
+        emailNotification.SendEmail(message);
+        smsNotification.SendSMS(message);
+    }
+}
+
+🔴 Issues in this Code
+❌ Violates DIP – NotificationService depends on specific classes (EmailNotification, SMSNotification).
+❌ Hard to Extend – Adding Push Notifications requires modifying NotificationService.
+❌ Tightly Coupled – Cannot easily replace or modify notification methods.
+
+To fix this issue, we introduce an abstraction (INotification) so that NotificationService depends on an interface, not a concrete class.
+Step 1️⃣: Create an Abstraction for Notifications
+// ✅ Abstraction: High-level module depends on this, not on concrete classes
+public interface INotification
+{
+    void Send(string message);
+}
+✔ Now, notifications are loosely coupled from the service.
+Step 2️⃣: Implement Concrete Notification Methods
+// ✅ Low-level module implements the abstraction
+public class EmailNotification : INotification
+{
+    public void Send(string message)
+    {
+        Console.WriteLine("Sending Email: " + message);
+    }
+}
+
+public class SMSNotification : INotification
+{
+    public void Send(string message)
+    {
+        Console.WriteLine("Sending SMS: " + message);
+    }
+}
+
+// ✅ We can add new types without modifying the NotificationService
+public class PushNotification : INotification
+{
+    public void Send(string message)
+    {
+        Console.WriteLine("Sending Push Notification: " + message);
+    }
+}
+✔ Now, NotificationService does not need to change if we add PushNotification.
+Step 3️⃣: Modify NotificationService to Depend on Abstraction
+// ✅ High-level module depends on abstraction (INotification), not concrete classes
+public class NotificationService
+{
+    private readonly INotification _notification;
+
+    public NotificationService(INotification notification)
+    {
+        _notification = notification;
+    }
+
+    public void SendNotification(string message)
+    {
+        _notification.Send(message);
+    }
+}
+✔ Now, NotificationService works with any notification type.
+
+Step 4️⃣: Use Dependency Injection to Pass Notification Type
+class Program
+{
+    static void Main()
+    {
+        // ✅ We can switch notification methods without modifying NotificationService
+        INotification email = new EmailNotification();
+        INotification sms = new SMSNotification();
+        INotification push = new PushNotification();
+
+        NotificationService emailService = new NotificationService(email);
+        emailService.SendNotification("Welcome Email!");
+
+        NotificationService smsService = new NotificationService(sms);
+        smsService.SendNotification("Your OTP is 123456");
+
+        NotificationService pushService = new NotificationService(push);
+        pushService.SendNotification("New offer available!");
+    }
+}
+
+✔ Now, we can change the notification type without modifying NotificationService.
+✔ We follow DIP by depending on abstractions (INotification), not concrete classes.
+
+✅ Benefits of Following DIP
+Bad Example (DIP Violation)	Good Example (Follows DIP)
+❌ High-level module (NotificationService) depends on concrete classes.	✅ High-level module depends on an interface (INotification).
+❌ Hard to extend – Adding new notifications requires modifying NotificationService.	✅ Easily extendable – Add new notifications without modifying existing code.
+❌ Tightly coupled – Changing one class affects others.	✅ Loosely coupled – Classes are independent.
+🎯 Summary
+🔹 DIP Rule: High-level modules should not depend on low-level modules. Both should depend on abstractions.
+🔹 Use interfaces to decouple classes and improve maintainability.
+🔹 Follow Dependency Injection to manage dependencies efficiently.
